@@ -1,7 +1,5 @@
-import { HabitDay } from './components/HabitDay'
 import './styles/global.css'
-import logoImage from './assets/logo.svg'
-import { Plus } from 'phosphor-react'
+import './lib/dayjs'
 import { Header } from './components/Header'
 import { SummaryTable } from './components/SummaryTable'
 
