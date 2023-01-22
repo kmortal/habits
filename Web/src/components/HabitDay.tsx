@@ -1,24 +1,32 @@
-import * as Checkbox from '@radix-ui/react-checkbox';
 import * as Popover from '@radix-ui/react-popover';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { Check } from 'phosphor-react';
+import { useState } from 'react';
+import { HabitsList } from './HabitsList';
+
 import { ProgressBar } from './ProgressBar';
 
 type HabitProps = {
     date: Date,
-    completed?: number,
+    deafultCompleted?: number,
     amount?: number
 }
 
-export function HabitDay({completed = 0, amount = 0, date} : HabitProps){
+export function HabitDay({deafultCompleted = 0, amount = 0, date} : HabitProps){
+    const [completed, setCompleted] = useState(deafultCompleted)
+    
     const dayAndMonth = dayjs(date).format('DD/MM')
     const dayOfWeek = dayjs(date).format('dddd')
 
     const completedPercentage = amount > 0 ? Math.round((completed / amount) * 100) : 0
+    
+    function handleCompletedChange(completed : number){
+        setCompleted(completed)
+    }
+
     return (
         <Popover.Root>
-            <Popover.Trigger className={clsx('w-10 h-10 bg-zinc-900 border-2 border-zinc-800 rounded-lg', {
+            <Popover.Trigger className={clsx('w-10 h-10 bg-zinc-900 border-2 border-zinc-800 rounded-lg transition-colors focus:ring-offset-2 focus:ring-offset-background focus:outline-none focus:ring-2 focus:ring-violet-500', {
                 'bg-zinc-900 border-zinc-800': completedPercentage == 0,
                 'bg-violet-900 border-violet-700': completedPercentage > 20 && completedPercentage < 20,
                 'bg-violet-800 border-violet-600': completedPercentage >= 20 && completedPercentage < 40,
@@ -28,25 +36,13 @@ export function HabitDay({completed = 0, amount = 0, date} : HabitProps){
             })}/>
 
             <Popover.Portal>
-                <Popover.Content className='min-w-[320px] p-6 rounded-2xl bg-zinc-900 flex flex-col'>
+                <Popover.Content className='min-w-[320px] max-h-[320px] p-6 rounded-2xl bg-zinc-900 flex flex-col overflow-y-scroll'>
                     <span className='font-extrabold leading-tight text-3xl'>{dayAndMonth}</span>
                     <span className='mt-1 font-semibold text-zinc-400 uppercase'>{dayOfWeek}</span>
                     
-                    <ProgressBar progress={completedPercentage}/>
+                    <ProgressBar progress={completedPercentage > 100 ? 100 : completedPercentage}/>
 
-                    <div className='mt-6 flex flex-col gap-3'>
-                        
-                        <Checkbox.Root className='flex items-center gap-3 group'>
-                            <div className='h-8 w-8 rounded-lg flex items-center justify-center bg-zinc-900 border-2 border-zinc-800 group-data-[state=checked]:bg-green-500 group-data-[state=checked]:border-green-500'>
-                                <Checkbox.Indicator>
-                                    <Check size={20} className='text-white'/>
-                                </Checkbox.Indicator>
-                            </div>
-                            <span className='text-white font-semibold text-xl leading-tight group-data-[state=checked]:line-through group-data-[state=checked]:text-zinc-400'>
-                                Programar com Prisma
-                            </span>
-                        </Checkbox.Root>
-                    </div>
+                    <HabitsList date={date} onCompletedChange={handleCompletedChange}/>
 
                     <Popover.Arrow height={8} width={16} className='fill-zinc-900'/>
                 </Popover.Content>
